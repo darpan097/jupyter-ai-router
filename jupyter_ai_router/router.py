@@ -131,7 +131,10 @@ class MessageRouter(LoggingConfigurable):
             room_id: Unique identifier for the chat room
             ychat: YChat instance for the room
         """
-        if room_id in self.active_chats:
+        # Check if this is a reconnection before disconnecting
+        is_reconnect = room_id in self.active_chats
+
+        if is_reconnect:
             self.log.warning(f"Chat {room_id} already connected to router, reconnecting...")
             # Disconnect the old one first to clean up observers
             self.disconnect_chat(room_id)
@@ -145,8 +148,10 @@ class MessageRouter(LoggingConfigurable):
 
         self.log.info(f"Connected chat {room_id} to router")
 
-        # Notify new chat observers
-        self._notify_chat_init_observers(room_id, ychat)
+        # Only notify chat init observers for truly new chats, not reconnections
+        # This prevents duplicate persona manager initialization
+        if not is_reconnect:
+            self._notify_chat_init_observers(room_id, ychat)
 
     def disconnect_chat(self, room_id: str) -> None:
         """
