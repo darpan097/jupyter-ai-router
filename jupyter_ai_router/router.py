@@ -136,8 +136,14 @@ class MessageRouter(LoggingConfigurable):
 
         if is_reconnect:
             self.log.warning(f"Chat {room_id} already connected to router, reconnecting...")
-            # Disconnect the old one first to clean up observers
-            self.disconnect_chat(room_id)
+            # Only clean up the old message observer, don't fully disconnect
+            # This preserves slash_cmd and chat_msg observers that need to persist
+            if room_id in self.message_observers:
+                old_ychat = self.active_chats[room_id]
+                try:
+                    old_ychat.ymessages.unobserve(self.message_observers[room_id])
+                except Exception as e:
+                    self.log.warning(f"Failed to unobserve old chat {room_id}: {e}")
 
         self.active_chats[room_id] = ychat
 
