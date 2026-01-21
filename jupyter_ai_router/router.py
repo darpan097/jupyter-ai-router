@@ -132,8 +132,9 @@ class MessageRouter(LoggingConfigurable):
             ychat: YChat instance for the room
         """
         if room_id in self.active_chats:
-            self.log.warning(f"Chat {room_id} already connected to router")
-            return
+            self.log.warning(f"Chat {room_id} already connected to router, reconnecting...")
+            # Disconnect the old one first to clean up observers
+            self.disconnect_chat(room_id)
 
         self.active_chats[room_id] = ychat
 
