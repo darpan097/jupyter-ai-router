@@ -135,15 +135,6 @@ class MessageRouter(LoggingConfigurable):
         is_reconnect = room_id in self.active_chats
 
         if is_reconnect:
-            self.log.warning(f"Chat {room_id} already connected to router, reconnecting...")
-            # Clean up the old message observer from the old YChat instance
-            if room_id in self.message_observers:
-                old_ychat = self.active_chats[room_id]
-                try:
-                    old_ychat.ymessages.unobserve(self.message_observers[room_id])
-                except Exception as e:
-                    self.log.warning(f"Failed to unobserve old chat {room_id}: {e}")
-
             # Clear chat_msg_observers for this room to allow re-registration
             # This prevents duplicate callbacks when persona manager re-registers
             if room_id in self.chat_msg_observers:
