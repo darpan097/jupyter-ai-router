@@ -132,9 +132,7 @@ class MessageRouter(LoggingConfigurable):
             ychat: YChat instance for the room
         """
         # Check if this is a reconnection before disconnecting
-        is_reconnect = room_id in self.active_chats
-
-        if is_reconnect:
+        if room_id in self.active_chats:
             # Clear chat_msg_observers for this room to allow re-registration
             # This prevents duplicate callbacks when persona manager re-registers
             if room_id in self.chat_msg_observers:
