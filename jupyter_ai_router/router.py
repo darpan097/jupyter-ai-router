@@ -147,6 +147,7 @@ class MessageRouter(LoggingConfigurable):
 
         self.log.info(f"Connected chat {room_id} to router")
 
+        # Notify new chat observers
         self._notify_chat_init_observers(room_id, ychat)
 
     def disconnect_chat(self, room_id: str) -> None:
