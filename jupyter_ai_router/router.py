@@ -131,9 +131,12 @@ class MessageRouter(LoggingConfigurable):
             room_id: Unique identifier for the chat room
             ychat: YChat instance for the room
         """
+        # Check if this is a reconnection before disconnecting
         if room_id in self.active_chats:
-            self.log.warning(f"Chat {room_id} already connected to router")
-            return
+            # Clear chat_msg_observers for this room to allow re-registration
+            # This prevents duplicate callbacks when persona manager re-registers
+            if room_id in self.chat_msg_observers:
+                self.chat_msg_observers[room_id].clear()
 
         self.active_chats[room_id] = ychat
 
